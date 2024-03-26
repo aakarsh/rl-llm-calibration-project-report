@@ -31,7 +31,6 @@
 \usepackage{inconsolata}
 
 %% Use the graphicx package to include figures.
-
 \usepackage{graphicx}
 
 
@@ -144,16 +143,31 @@ the calibration of the model as well.
 \begin{figure}
   \centering
   \includegraphics[width=0.5\textwidth]{figures/0-shot-7b-vs-13b-chat.png}
-  \includegraphics[width=0.5\textwidth]{figures/0-shot-13-b-chat-vs-13-b-hf.png}
-  \includegraphics[width=0.5\textwidth]{figures/0-shot-13-b-chat-vs-subjects.png}
   \caption{Calibration of the 13b-chat model on the MMLU dataset, we 
   note that it is closer, in calibration than the 7b-chat model.}
 \end{figure}
 
 \subsection{Model Calibration By Fine Tuning}  
 
+We first note that fine tuning improves 0-shot calibration. For both 7b and 13b models as observed in 
+Figure: \ref{fig:chat-vs-hf}. Where we note the chat model is closer to the ideal calibration line.
+
+\begin{figure}
+  \includegraphics[width=0.5\textwidth]{figures/0-shot-13-b-chat-vs-13-b-hf.png}
+  \caption{We note that chat models are better calibrated than base modes for both 7b and 13b parameter models}
+  \label{fig:chat-vs-hf}
+\end{figure}
 
 \subsection{Model Calibration By Subject Specialization}  
+
+Another interesting phenomenon is seen for subject specialization on the MMLU bench mark. We note that calibration for 13b models  trends closer to ideal calibration line for more confident response witht he exception of STEM fields where the calibration is substantially worse, having us conclude that the model is 
+overconfident in and incorrect in scientific fields.
+
+\begin{figure}
+  \includegraphics[width=0.5\textwidth]{figures/0-shot-13-b-chat-vs-subjects.png}
+  \caption{We note that 13-b chat model suffers from overconfidence in calibration in STEM fields, but has good calibration on knowledge retrieval tasks}
+  \label{fig:chat-vs-hf}
+\end{figure}
 
 \section{Results}
 
