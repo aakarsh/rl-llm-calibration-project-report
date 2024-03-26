@@ -1,0 +1,4 @@
+report.pdf filter=lfs diff=lfs merge=lfs -text
+figures/0-shot-13-b-chat-vs-13-b-hf.png filter=lfs diff=lfs merge=lfs -text
+figures/0-shot-13-b-chat-vs-subjects.png filter=lfs diff=lfs merge=lfs -text
+figures/0-shot-7b-vs-13b-chat.png filter=lfs diff=lfs merge=lfs -text
