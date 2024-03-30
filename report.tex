@@ -140,9 +140,6 @@ questions which covers 57 tasks in various subjects including
 elementary mathematics, US history, computer science, law, and more. It 
 serves as a challenging dataset for most modern large language models and can be used to evaluate their calibration.
 
-\subsubsection{LogicQA}
-
-LogicQA comprehensive dataset, named LogiQA, which is sourced from expert-written questions for testing human Logical reasoning. It consists of 8,678 QA instances, covering multiple types of deductive reasoning. Results show that state-of-the-art neural models perform by far worse than human ceiling. Our dataset can also serve as a benchmark for reinvestigating logical AI under the deep learning NLP setting. The dataset is freely available at this https URL
 
 \subsection{Model Calibration By Number of Parameters}
 
@@ -162,6 +159,7 @@ the calibration of the model as well.
   \caption{Calibration of the 13b-chat model on the 
   MMLU dataset, we  note that it is closer, in calibration than the 7b-chat model, thus helping us conclude that bigger models are better calibrated.}
 \end{figure}
+
 
 \begin{figure}
   \centering
@@ -192,11 +190,22 @@ is overconfident and incorrect on scientific questions.
   \label{fig:chat-vs-hf}
 \end{figure}
 
+\subsection{LogicQA}
+
+LogicQA comprehensive dataset, named LogiQA, which is sourced from expert-written questions for testing human Logical reasoning. It consists of 8,678 QA instances, covering multiple types of deductive reasoning. Results show that state-of-the-art neural models perform by far worse than human ceiling. Our dataset can also serve as a benchmark for reinvestigating logical AI under the deep learning NLP setting. 
+
 \begin{figure}
   \includegraphics[width=0.5\textwidth]{figures/5-shot-7b-13-b-logic-qa.png}
   \caption{We note that in 5-shot scenario similar improvements by model size is seen in 7b chat vs 13 chat models.}
   \label{fig:logicqa-7b-vs-13b-chat}
 \end{figure}
+
+\subsection{HumanEval}
+
+\subsection{GSM8k}
+
+\subsection{Trivia}
+
 
 \section{Results}
 
