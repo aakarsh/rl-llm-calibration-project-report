@@ -83,6 +83,17 @@ model is answering the question correctly.
 \end{abstract}
 
 \section{Introduction}
+Understanding the reliability and correctness of language model (LM) generations is crucial in ensuring their practical utility and trustworthiness. One significant aspect of this inquiry pertains to the calibration of LMs and their ability to accurately indicate uncertainty about their outputs. This issue has gathered considerable attention in recent research, particularly within the context of large-scale language models.
+
+In the paper, Kadavath et al. [2022], it extensively examined the calibration of big base LMs, demonstrating their well-calibrated nature. Their study revealed that the probabilities assigned to answer options on benchmark datasets such as BIGBench and MMLU correlated effectively with the correctness probabilities across trials. However, investigations into reinforcement learning-based language models (RL-LMs) have raised concerns about calibration deterioration following fine-tuning [OpenAI, 2023; Kadavath et al., 2022], albeit with inconsistent findings.
+
+Moreover, an additional challenge in LM-generated content relates to the occurrence of hallucinations, where the model generates false or improbable information. To address this, fine-tuning LMs with reinforcement learning has been suggested, with the goal of prompting responses like "I don't know" to receive high rewards. However, concerns have been raised regarding the potential evasiveness of such models. The present project seeks to provide more comprehensive understanding and explore various aspects of calibration in RL-LMs.
+
+
+\subsection{Llama Model}
+
+\subsection{Gemma Model}
+
 
 %% Introduction, Motivation and Explanation of the 
 %% research question in the context 
@@ -92,7 +103,7 @@ model is answering the question correctly.
 %% exhaustive literature review; it is sufficient to mention relevant work 
 %% from the project proposals and the class materials
 
-\section{Method}
+\section{Methods}
 
 \subsection{Introduction}
 
@@ -201,8 +212,6 @@ out of distribution.
 \section{Acknowledgements}
 
 \section{References}
-
-\section{Acknowledgements}
 
 % Entries for the entire Anthology, followed by custom entries
 \bibliography{anthology,custom}
