@@ -172,7 +172,7 @@ multi-shot prompting as substantially improves the calibration of smaller 7-b mo
 
 \begin{figure}
   \includegraphics[width=0.5\textwidth]{figures/0-shot-13-b-chat-vs-13-b-hf.png}
-  \caption{We note that chat models are better calibrated than base modes for both 7b and 13b parameter models}
+  \caption{We note that chat models are better calibrated than base modes for both 7b and 13b parameter models, moreover base models do not respond well to multi-shot responses.}
   \label{fig:chat-vs-hf}
 \end{figure}
 
@@ -185,6 +185,12 @@ is overconfident and incorrect on scientific questions.
   \includegraphics[width=0.5\textwidth]{figures/0-shot-13-b-chat-vs-subjects.png}
   \caption{We note that 13-b chat model suffers from overconfidence in calibration in STEM fields, but has good calibration on knowledge retrieval tasks}
   \label{fig:chat-vs-hf}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=0.5\textwidth]{figures/5-shot-7b-13-b-logic-qa.png}
+  \caption{We note that in 5-shot scenario similar improvements by model size is seen in 7b chat vs 13 chat models.}
+  \label{fig:logicqa-7b-vs-13b-chat}
 \end{figure}
 
 \section{Results}
