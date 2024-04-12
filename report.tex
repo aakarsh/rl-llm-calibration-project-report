@@ -73,16 +73,23 @@
 \begin{abstract}
   The popularity of large language models has lead to a growing 
 need to characterize their behavior and understanding 
-beyond the generation grammatical sentences. In this study we 
-attempt to replicate and extend the calibration study of 
-\cite{kadavath2022language} on open models and datasets, 
+beyond the generation grammatical sentences. In this paper we 
+examine the issue of calibration  calibration by replicating 
+elements of  
+Kadavath 2022 \cite{kadavath2022language} on open models and datasets, 
 attempting compare model reported response probabilities to 
 their actual calibration, that is the certainty with which a model answers 
 a question with a given completion and the probability that the 
 model is answering the question correctly. 
 \end{abstract}
 
+\section{Background}
+\textbf{Write: }
+ \emph{What are language models? What is history of transformer ? What is problem with generations of the transformer model?}
+
+
 \section{Introduction}
+
 Understanding the reliability and correctness of language model (LM) generations is crucial in ensuring their practical utility and trustworthiness. One significant aspect of this inquiry pertains to the calibration of LMs and their ability to accurately indicate uncertainty about their outputs. This issue has gathered considerable attention in recent research, particularly within the context of large-scale language models.
 
 In the paper, Kadavath et al. [2022], it extensively examined the calibration of big base LMs, demonstrating their well-calibrated nature. Their study revealed that the probabilities assigned to answer options on benchmark datasets such as BIGBench and MMLU correlated effectively with the correctness probabilities across trials. However, investigations into reinforcement learning-based language models (RL-LMs) have raised concerns about calibration deterioration following fine-tuning [OpenAI, 2023; Kadavath et al., 2022], albeit with inconsistent findings.
@@ -195,10 +202,15 @@ is overconfident and incorrect on scientific questions.
 LogicQA comprehensive dataset, named LogiQA, which is sourced from expert-written questions for testing human Logical reasoning. It consists of 8,678 QA instances, covering multiple types of deductive reasoning. Results show that state-of-the-art neural models perform by far worse than human ceiling. Our dataset can also serve as a benchmark for reinvestigating logical AI under the deep learning NLP setting. 
 
 \begin{figure}
-  \includegraphics[width=0.5\textwidth]{figures/5-shot-7b-13-b-logic-qa.png}
-  \caption{We note that in 5-shot scenario similar improvements by model size is seen in 7b chat vs 13 chat models.}
+  \includegraphics[width=0.5\textwidth]{figures/5-shot-7b-13b-logic-qa.png}
+  \caption{We note that in 5-shot scenario similar improvements by model size is seen in 7b chat vs 13 chat models on LogicQA dataset}
   \label{fig:logicqa-7b-vs-13b-chat}
 \end{figure}
+
+\subsection{TruthfulQA}
+
+TruthfulQA is a benchmark to measure whether a language model is truthful in generating answers to questions. The benchmark comprises 817 questions that span 38 categories, including health, law, finance and politics. Questions are crafted so that some humans would answer falsely due to a false belief or misconception. To perform well, models must avoid generating false answers learned from imitating human texts.
+
 
 \subsection{HumanEval}
 
@@ -209,6 +221,10 @@ LogicQA comprehensive dataset, named LogiQA, which is sourced from expert-writte
 \end{figure}
 
 \subsection{GSM8k}
+
+GSM8K (Grade School Math 8K) is a dataset of 8.5K high quality linguistically diverse grade school math word problems. The dataset was created to support the task of question answering on basic mathematical problems that require multi-step reasoning.
+
+These problems take between 2 and 8 steps to solve. Solutions primarily involve performing a sequence of elementary calculations using basic arithmetic operations  to reach the final answer. A bright middle school student should be able to solve every problem: from the paper, "Problems require no concepts beyond the level of early Algebra, and the vast majority of problems can be solved without explicitly defining a variable." Solutions are provided in natural language, as opposed to pure math expressions. 
 
 \subsection{Trivia}
 
