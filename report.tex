@@ -183,6 +183,37 @@ serves as a challenging dataset for most modern large language models and can be
         \label{fig:three graphs}
 \end{figure*}
 
+\begin{figure*}
+     \centering
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering \includegraphics[width=1.3\textwidth]{figures/0-MMLU-subjects.png}
+         \caption{0-shot performance on MMLU dataset, we note calibration flattens fails to improve after 30\%, The model stall on accuracy unlike in multishot prompting scenario.}
+         \label{fig:0-shot-MMLU}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=1.3\textwidth]{figures/5-shot-MMLU-subjects.png}
+         \caption{5-shot performance on MMLU on of chat models, we note that calibration improves with prompting for chat models, 13b-chat is better calibrated than 7b-chat}
+         \label{fig:5-shot-logicqa}
+     \end{subfigure}     
+     
+     \hfill
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering \includegraphics[width=0.9\textwidth]{figures/0-shot-MMLU-roc.png}
+         \caption{0-shot MMLU shows poor classification performance},
+         \label{fig:0-shot-MMLU}
+    \end{subfigure} 
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering \includegraphics[width=0.9\textwidth]{figures/5-shot-MMLU-roc.png}
+         \caption{5-shot ROC performance of Correct vs Rest classifier on 
+         MMLU, we note that under prompting chat models accuracy and calibration shows marked improvement.},
+         \label{fig:0-shot-MMLU}
+    \end{subfigure} 
+    
+        \caption{Calibration Performance of Chat and Base models on the MMLU multiple choice question answering dataset.}
+        \label{fig:three graphs}
+\end{figure*}
 
 \subsection{Model Calibration By Number of Parameters}
 
