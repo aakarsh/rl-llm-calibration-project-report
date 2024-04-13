@@ -223,21 +223,11 @@ multi-shot prompting as substantially improves the calibration of smaller 7-b mo
 Another interesting phenomenon is seen for subject specialization on the MMLU bench mark. We note that calibration for 13b models  trends closer to ideal calibration line for more confident response with the exception of STEM fields where the calibration is substantially worse, having us conclude that the model 
 is overconfident and incorrect on scientific questions.
 
-\begin{figure}
-  \includegraphics[width=0.5\textwidth]{figures/0-shot-13-b-chat-vs-subjects.png}
-  \caption{We note that 13-b chat model suffers from overconfidence in calibration in STEM fields, but has good calibration on knowledge retrieval tasks}
-  \label{fig:chat-vs-hf}
-\end{figure}
 
 \subsection{LogicQA}
 
 LogicQA comprehensive dataset, named LogiQA, which is sourced from expert-written questions for testing human Logical reasoning. It consists of 8,678 QA instances, covering multiple types of deductive reasoning. Results show that state-of-the-art neural models perform by far worse than human ceiling. Our dataset can also serve as a benchmark for reinvestigating logical AI under the deep learning NLP setting. 
 
-\begin{figure}
-  \includegraphics[width=0.5\textwidth]{figures/5-shot-7b-13b-logic-qa.png}
-  \caption{We note that in 5-shot scenario similar improvements by model size is seen in 7b chat vs 13 chat models on LogicQA dataset}
-  \label{fig:logicqa-7b-vs-13b-chat}
-\end{figure}
 
 \subsection{TruthfulQA}
 
