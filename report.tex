@@ -32,7 +32,8 @@
 
 %% Use the graphicx package to include figures.
 \usepackage{graphicx}
-
+\usepackage{caption}
+\usepackage{subcaption}
 
 % If the title and author information does not fit in the area allocated, uncomment the following
 %
@@ -71,16 +72,10 @@
 \maketitle
 
 \begin{abstract}
-  The popularity of large language models has lead to a growing 
-need to characterize their behavior and understanding 
-beyond the generation grammatical sentences. In this paper we 
-examine the issue of calibration  calibration by replicating 
-elements of  
-Kadavath 2022 \cite{kadavath2022language} on open models and datasets, 
-attempting compare model reported response probabilities to 
-their actual calibration, that is the certainty with which a model answers 
-a question with a given completion and the probability that the 
-model is answering the question correctly. 
+The popularity of large language models has lead to a growing need to characterize their behavior and understanding beyond the generation grammatical sentences. In this paper we 
+examine the issue of calibration  calibration by replicating elements of  
+Kadavath 2022 \cite{kadavath2022language} on several multiple-choice datasets (MMLU, LogicQA, TruthfulQA) as well as datasets explicitly converted into multiple choice format such as HumanEval, GSM8K and TriviaQA which are open ended question answering datasets.
+Using the the LLamma Base and its counter part LLama Chat fine-tuned for question answering for various model sizes we attempt to asses how fine-tuning affects model calibration. We find that fine-tuning improves calibration on tasks where the model is predisposed to answering the question correctly, however on tasks which the model is not able to reason about correctness about fine-tuning leads to over-confidence in selected options without corresponding increase in accuracy.
 \end{abstract}
 
 \section{Background}
@@ -99,7 +94,6 @@ Moreover, an additional challenge in LM-generated content relates to the occurre
 
 \subsection{Llama Model}
 
-\subsection{Gemma Model}
 
 
 %% Introduction, Motivation and Explanation of the 
@@ -173,6 +167,34 @@ the calibration of the model as well.
   \includegraphics[width=0.5\textwidth]{figures/0-shot-vs-5-shot-7b-vs-13b-chat.png}
   \caption{Calibration of smaller models like 7b can be substantially improved by multi-shot prompting, 5-shot prompting of smaller 7-b model brings it close to 13-b model without prompting}
 \end{figure}
+
+\begin{figure*}
+     \centering
+     \begin{subfigure}[b]{0.3\textwidth}
+         \centering
+         \includegraphics[width=1.3\textwidth]{figures/0-shot-vs-5-shot-7b-vs-13b-chat.png}
+         \caption{$y=x$}
+         \label{fig:y equals x}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.3\textwidth}
+         \centering
+         \includegraphics[width=1.3\textwidth]{figures/0-shot-vs-5-shot-7b-vs-13b-chat.png}
+         \caption{$y=3\sin x$}
+         \label{fig:three sin x}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.3\textwidth}
+         \centering
+         \includegraphics[width=1.3\textwidth]{figures/0-shot-vs-5-shot-7b-vs-13b-chat.png}
+         \caption{$y=5/x$}
+         \label{fig:five over x}
+     \end{subfigure}
+        \caption{5-shot vs 0-shot Calibration Performance}
+        \label{fig:three graphs}
+\end{figure*}
+
+
 
 \subsection{Model Calibration By Fine Tuning}  
 
