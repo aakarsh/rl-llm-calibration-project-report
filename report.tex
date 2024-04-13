@@ -41,7 +41,7 @@
 %
 % and set <dim> to something 5cm or larger.
 
-\title{A Case Study Replicating Calibration of Large Language Models on Open Models and Datasets}
+\title{Examining Large Language Model Calibration for Question Answering}
 
 % Author information can be set in various styles:
 % For several authors from the same institution:
@@ -72,15 +72,24 @@
 \maketitle
 
 \begin{abstract}
-The popularity of large language models has lead to a growing need to characterize their behavior and understanding beyond the generation grammatical sentences. In this paper we 
-examine the issue of calibration  calibration by replicating elements of  
-Kadavath 2022 \cite{kadavath2022language} on several multiple-choice datasets (MMLU, LogicQA, TruthfulQA) as well as datasets explicitly converted into multiple choice format such as HumanEval, GSM8K and TriviaQA which are open ended question answering datasets.
-Using the the LLamma Base and its counter part LLama Chat fine-tuned for question answering for various model sizes we attempt to asses how fine-tuning affects model calibration. We find that fine-tuning improves calibration on tasks where the model is predisposed to answering the question correctly, however on tasks which the model is not able to reason about correctness about fine-tuning leads to over-confidence in selected options without corresponding increase in accuracy.
-\end{abstract}
+In this paper, we examine the issue of calibration of large language models. 
+That is the interaction between the \emph{confidence} of a predicted answer 
+on a question-answering task with its \emph{empirical likelihood 
+of being correct}.
 
-\section{Background}
-\textbf{Write: }
- \emph{What are language models? What is history of transformer ? What is problem with generations of the transformer model?}
+We replicate elements of previous calibration study \cite{kadavath2022language} 
+on several multiple-choice  (MMLU, LogicQA, TruthfulQA) and 
+open-ended question answering datasets translated into 
+the multiple choice format (TriviaQA, HumanEval, GSM8k). 
+
+We find that models do scale in their calibration ability by model size. 
+Moreover models fine-tuned for conversation improve 
+in calibration and accuracy under multi-shot prompting. 
+However, we also observe that for tasks beyond models reasoning 
+capability (complex logical and scientific reasoning) 
+fine-tuning harms models accuracy and leads to overconfident 
+predictions.
+\end{abstract}
 
 
 \section{Introduction}
@@ -135,6 +144,7 @@ or over-confident  in its answers respectively.
 \subsection{Dataset}
 
 \subsubsection{MMLU}
+
 The Measuring Massive Multitask Language Understanding (MMLU) 
 \cite{hendrycks2021measuring} is a massive dataset of multiple choice 
 questions which covers 57 tasks in various subjects including 
@@ -144,7 +154,7 @@ serves as a challenging dataset for most modern large language models and can be
 \begin{figure*}
      \centering
      \begin{subfigure}[b]{0.49\textwidth}
-         \centering \includegraphics[width=1.3\textwidth]{figures/0-shot-13-b-chat-vs-13-b-hf}
+         \centering \includegraphics[width=1.3\textwidth]{figures/0-shot-MMLU.png}
          \caption{0-shot performance on MMLU dataset, we note calibration flattens fails to improve after 30\%, The model stall on accuracy unlike in multishot prompting scenario.}
          \label{fig:0-shot-MMLU}
      \end{subfigure}
@@ -267,7 +277,6 @@ multi-shot prompting as substantially improves the calibration of smaller 7-b mo
 Another interesting phenomenon is seen for subject specialization on the MMLU bench mark. We note that calibration for 13b models  trends closer to ideal calibration line for more confident response with the exception of STEM fields where the calibration is substantially worse, having us conclude that the model 
 is overconfident and incorrect on scientific questions.
 
-
 \subsection{LogicQA}
 
 LogicQA comprehensive dataset, named LogiQA, which is sourced from expert-written questions for testing human Logical reasoning. It consists of 8,678 QA instances, covering multiple types of deductive reasoning. Results show that state-of-the-art neural models perform by far worse than human ceiling. Our dataset can also serve as a benchmark for reinvestigating logical AI under the deep learning NLP setting. 
@@ -292,10 +301,11 @@ GSM8K (Grade School Math 8K) is a dataset of 8.5K high quality linguistically di
 
 These problems take between 2 and 8 steps to solve. Solutions primarily involve performing a sequence of elementary calculations using basic arithmetic operations  to reach the final answer. A bright middle school student should be able to solve every problem: from the paper, "Problems require no concepts beyond the level of early Algebra, and the vast majority of problems can be solved without explicitly defining a variable." Solutions are provided in natural language, as opposed to pure math expressions. 
 
-\subsection{Trivia}
+\subsection{Trivia QA}
 
 
 \section{Results}
+
 
 \section{Discussion}
 
