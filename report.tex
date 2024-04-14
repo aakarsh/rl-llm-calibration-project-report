@@ -83,12 +83,11 @@ open-ended question answering datasets translated into
 the multiple choice format (TriviaQA, HumanEval, GSM8k). 
 
 We find that models do scale in their calibration ability by model size. 
-Moreover models fine-tuned for conversation improve 
-in calibration and accuracy under multi-shot prompting. 
-However, we also observe that for tasks beyond models reasoning 
-capability (complex logical and scientific reasoning) 
-fine-tuning harms models accuracy and leads to overconfident 
-predictions.
+Moreover models fine-tuned for conversation improve in calibration and 
+accuracy under multi-shot prompting. However, we also observe that for tasks beyond 
+models reasoning  capability (complex logical and scientific reasoning) fine-tuning harms models 
+accuracy and leads to overconfidence in model predictions.
+
 \end{abstract}
 
 
@@ -101,7 +100,6 @@ In the paper, Kadavath et al. [2022], it extensively examined the calibration of
 Moreover, an additional challenge in LM-generated content relates to the occurrence of hallucinations, where the model generates false or improbable information. To address this, fine-tuning LMs with reinforcement learning has been suggested, with the goal of prompting responses like "I don't know" to receive high rewards. However, concerns have been raised regarding the potential evasiveness of such models. The present project seeks to provide more comprehensive understanding and explore various aspects of calibration in RL-LMs.
 
 
-\subsection{Llama Model}
 
 
 
@@ -113,43 +111,74 @@ Moreover, an additional challenge in LM-generated content relates to the occurre
 %% exhaustive literature review; it is sufficient to mention relevant work 
 %% from the project proposals and the class materials
 
-\section{Methods}
+\section{Methodology}
 
 \subsection{Introduction}
+%% Not enough mathematical explanation of what the term mean. 
+%% Not explaining, what log completion probbilty means. 
+%% No explantation of transfoerm completion. 
 
 We measure the calibration in keeping with the methodology presented 
 in  \cite{kadavath2022language}. The model is queried in either a
-0-shot or 5-shot manner. The transformer model is given a question 
-prompt  with the each of the multiple choice options.  In the 5-shot 
-methodology, in addition to the question under test we proceed the 
-question with 4 additional questions with in the same multiple 
-choice format in order to provide the model with enough context to 
-understand the expected format for answering the question.
+0-shot or 5-shot manner. The transformer model is given a 
+question prompt  with the each of the multiple choice options.  
 
-For each prompt completion pair we compute the log probability of 
-the completion normalized by its completion length. 
+In the 5-shot methodology, in addition to the question under 
+test we proceed the question with 4 additional questions 
+in the same multiple choice format in order to provide 
+the model with enough context to understand the expected format for answering the questions.
 
+For each prompt completion pair we compute the log probability 
+of  the completion normalized by its completion length. 
 
-The computed probabilities are then grouped in bins in $10$ bins from 
-$0$ to $1$ were we compute the average frequency of answering 
-correctly for each bin. 
+The computed probabilities are then grouped in bins in 
+equally weighted bins from  $0$ to $1$ were we compute 
+the average frequency of answering correctly for each bin. 
 
-For ideal calibration, that is when the model completion probability aligns
-closely with the actual probability of answering the question correctly, these 
-two computed probabilities must be equal, thus a ideal calibration would be 
-represented  by a line of slope $1$ in the calibration plot. Negative 
-and positive deviations thus represent a model which is under-confident 
-or over-confident  in its answers respectively.
+For ideal calibration, that is when the 
+model completion probability aligns closely with the actual 
+likelihood of answering the question correctly, these 
+two computed probabilities must be equal, thus an 
+ideal calibration would be represented  by a line of 
+slope $1$ in the calibration plot. 
+Negative and positive deviations thus represent a model 
+which is under-confident  or over-confident  in its answers respectively.
 
-\subsection{Dataset}
+We judge the models' accuracy by its ability to assign high-probability to correct answers. The accuracy can be partially summarized using the AUROC metric as well as a 
+receiver operating characteristic curve used where the models
+predicted answer being chosen is considered a true positive classification by the model.
+
+%%% Explain more about AUROC metric.
+
+\subsection{Datasets}
+
+In order to understand the the behavior of 
+base vs chat models (models fine tuned as conversational agents). We test out models of varying sizes (7b, 13b and in some cases 70b parametes) on a variety of question answering datasets. A brief explanation of the datasets used is given here:
 
 \subsubsection{MMLU}
 
 The Measuring Massive Multitask Language Understanding (MMLU) 
-\cite{hendrycks2021measuring} is a massive dataset of multiple choice 
-questions which covers 57 tasks in various subjects including 
-elementary mathematics, US history, computer science, law, and more. It 
-serves as a challenging dataset for most modern large language models and can be used to evaluate their calibration.
+\cite{hendrycks2021measuring} is a massive dataset of multiple choice questions which covers 57 tasks in various subjects including elementary mathematics, US history, computer science, law, and more. For convinience the datasets are grouped into 
+four catagories \emph{STEM},  \emph{Humanities}, \emph{Social Sciences}, and \emph{Other}(global facts, marketing, accounting etc.). Questions test the model for both factual and conceptual understanding of the given topics.
+
+\subsubsection{LogicQA}
+
+LogicQA comprehensive dataset, named LogiQA, which is sourced from expert-written questions for testing human Logical reasoning. It consists of 8,678 QA instances, covering multiple types of deductive reasoning. Results show that state-of-the-art neural models perform by far worse than human ceiling. Along with TruthfulQA this dataset shows illustrates limitations of calibration when information is less factual in nature.
+
+\subsubsection{TruthfulQA}
+
+TruthfulQA is a benchmark to measure whether a language model is truthful in generating answers to questions. The benchmark comprises 817 questions that span 38 categories, including health, law, finance and politics. Questions are crafted so that some humans would answer falsely due to a false belief or misconception. To perform well, models must avoid generating false answers learned from imitating human texts.  Of the models 
+tested we find this dataset to be the most challenging. 
+
+
+\section{Model}
+
+The tests are conducted on the 3 to 4 variants of the 
+LLama Model. For lower memory footprints we use the LLama 7b  model with roughly 7 billion parameters in two variants one base mode which has not been fine tuned using RLHF as a conversational agent as well as Llama 7b chat a model which has been fine tuned for conversation. Additionally 13b and 70b  variants of the two model types are used where feasible. Generally, we find early trends found in 7b models holding for larger parameter variants.
+
+\section{Results}
+
+
 
 \begin{figure*}
      \centering
@@ -189,13 +218,13 @@ serves as a challenging dataset for most modern large language models and can be
      \centering
      \begin{subfigure}[b]{0.60\textwidth}
          \centering \includegraphics[width=1.1\textwidth]{figures/0-shot-MMLU-subjects.png}
-         \caption{\textbf{0-shot MMLU by Subject} }
+         \caption{\textbf{0-shot MMLU by Subject(Chat):} }
          \label{fig:0-shot-MMLU}
      \end{subfigure}
      \hfill
      \begin{subfigure}[b]{0.38\textwidth}
          \centering \includegraphics[width=0.9\textwidth]{figures/0-shot-MMLU-subjects-roc.png}
-         \caption{\textbf{0-shot MMLU by Subject ROC:} Performance on MMLU shows poor classification, however multi-shot prompting enhances classification for subjects the model is predisposed to answer}
+         \caption{\textbf{0-shot MMLU by Subject ROC (Chat):} Performance on MMLU shows poor classification, however multi-shot prompting enhances classification for subjects the model is predisposed to answer}
          \label{fig:0-shot-MMLU-ROC}
     \end{subfigure}
     
@@ -203,14 +232,14 @@ serves as a challenging dataset for most modern large language models and can be
      \begin{subfigure}[b]{0.60\textwidth}
          \centering
          \includegraphics[width=1.1\textwidth]{figures/5-shot-MMLU-subjects.png}
-         \caption{\textbf{5-shot MMLU by Subject:}  For subjects which the model can correctly 
+         \caption{\textbf{5-shot MMLU by Subject(Chat):}  For subjects which the model can correctly 
          answer multi-shot prompting improves accuracy and calibration}
          \label{fig:5-shot-logicqa}
      \end{subfigure}     
     \hfill 
      \begin{subfigure}[b]{0.38\textwidth}
          \centering \includegraphics[width=0.9\textwidth]{figures/5-shot-MMLU-subjects-roc.png}
-         \caption{\textbf{5-shot MMLU by Subject ROC:} We note large increase in accuracy for 
+         \caption{\textbf{5-shot MMLU by Subject ROC (Chat):} We note large increase in accuracy for 
          Humanities and Other, category with multi-shot prompting}
          \label{fig:0-shot-MMLU}
     \end{subfigure} 
@@ -309,14 +338,7 @@ multi-shot prompting as substantially improves the calibration of smaller 7-b mo
 Another interesting phenomenon is seen for subject specialization on the MMLU bench mark. We note that calibration for 13b models  trends closer to ideal calibration line for more confident response with the exception of STEM fields where the calibration is substantially worse, having us conclude that the model 
 is overconfident and incorrect on scientific questions.
 
-\subsection{LogicQA}
 
-LogicQA comprehensive dataset, named LogiQA, which is sourced from expert-written questions for testing human Logical reasoning. It consists of 8,678 QA instances, covering multiple types of deductive reasoning. Results show that state-of-the-art neural models perform by far worse than human ceiling. Our dataset can also serve as a benchmark for reinvestigating logical AI under the deep learning NLP setting. 
-
-
-\subsection{TruthfulQA}
-
-TruthfulQA is a benchmark to measure whether a language model is truthful in generating answers to questions. The benchmark comprises 817 questions that span 38 categories, including health, law, finance and politics. Questions are crafted so that some humans would answer falsely due to a false belief or misconception. To perform well, models must avoid generating false answers learned from imitating human texts.
 
 
 \subsection{HumanEval}
@@ -335,8 +357,6 @@ These problems take between 2 and 8 steps to solve. Solutions primarily involve 
 
 \subsection{Trivia QA}
 
-
-\section{Results}
 
 
 \section{Discussion}
