@@ -73,6 +73,8 @@
   Affiliation / Address line 3 \\
   \texttt{email@domain} \\}
 
+%
+
 \begin{document}
 \maketitle
 
@@ -86,19 +88,19 @@ That is the relationship between the \emph{confidence}
 of a predicted answer on a question-answering task 
 with its \emph{empirical likelihood of being correct}.
 
-We replicate elements of previous calibration study \cite{kadavath2022language} 
-on several multiple-choice  (MMLU, LogicQA, TruthfulQA) and 
-open-ended question answering datasets translated into 
-the multiple choice format (TriviaQA, HumanEval, GSM8k). 
+We replicate elements of previous calibration study 
+\cite{kadavath2022language} on several multiple-choice 
+(MMLU, LogicQA, TruthfulQA) 
 
-We find that models do scale in their calibration ability by model size. Moreover models fine-tuned as conversation agents do 
-improve in their calibration and accuracy under 
+We find that models do scale in their calibration ability by 
+model size. Moreover models fine-tuned as conversation agents 
+do improve in their calibration and accuracy under 
 few-shot prompting. 
 
-However, we also observe that for tasks beyond models 
-reasoning  capability (complex logical and scientific reasoning) 
-fine-tuning harms model's accuracy and leads to 
-overconfidence in model predictions.
+However, we also observe that for tasks beyond models reasoning 
+capability (complex logical and scientific reasoning) fine-tuning 
+harms model's accuracy and leads to overconfidence 
+in model predictions.
 
 \end{abstract}
 
@@ -113,11 +115,23 @@ overconfidence in model predictions.
 %% it is sufficient to mention relevant work from the project 
 %% proposals and the class materials.
 
-Understanding the reliability and correctness of language model (LM) generations is crucial in ensuring their practical utility and trustworthiness. One significant aspect of this inquiry pertains to the calibration of LMs and their ability to accurately indicate uncertainty about their outputs. This issue has gathered considerable attention in recent research, particularly within the context of large-scale language models.
+Understanding the reliability and correctness of language model (LM) 
+generations is crucial in ensuring their practical utility and trustworthiness.  Trustworthiness requires that the language model 
+produce not just grammatically correct sentences, but sentences 
+which accurately reflect the language models' understanding 
+of the state of the world as well as the its understanding as to 
+the limits its ability reason based on its current 
+internal knowledge about the question at hand. Calibration is a metric commonly used to quantify such a relationship. 
 
-In the paper, Kadavath et al. [2022], it extensively examined the calibration of big base LMs, demonstrating their well-calibrated nature. Their study revealed that the probabilities assigned to answer options on benchmark datasets such as BIGBench and MMLU correlated effectively with the correctness probabilities across trials. However, investigations into reinforcement learning-based language models (RL-LMs) have raised concerns about calibration deterioration following fine-tuning [OpenAI, 2023; Kadavath et al., 2022], albeit with inconsistent findings.
+Where calibration refers to the relationship between 
+the language model's \emph{confidence} of a predicted answer 
+on a question-answering task being correct with 
+its  \emph{empirical likelihood} of actually being  
+correct. In the case of a perfectly calibrated model, the relationship is linear \cite{spiess2024quality}. 
 
-Moreover, an additional challenge in LM-generated content relates to the occurrence of hallucinations, where the model generates false or improbable information. To address this, fine-tuning LMs with reinforcement learning has been suggested, with the goal of prompting responses like "I don't know" to receive high rewards. However, concerns have been raised regarding the potential evasiveness of such models. The present project seeks to provide more comprehensive understanding and explore various aspects of calibration in RL-LMs.
+Several observations have been made on the topic of calibration in LLMs specifically. Kadavath et al. finds that the probabilities assigned to answer options on benchmark datasets seem to correlate with correctness probabilities, a tendency which is especially visible for the results obtained by bigger models \cite{kadavath2022language}. They also mention that while LLMs are generally well-calibrated, the use of reinforcement learning can sometimes damage calibration, but that a temperature adjustment seems to do the trick in replacing the model on the path of correct calibration.
+
+In this study, we aim to replicate the findings of Kadavath et al., focusing on obtaining calibration measures for different LLama models \cite{touvron2023llama} of different sizes, datasets pertaining to a variety of tasks (general question answering, logic), in order to gain a more complete understanding of the factors that might influence an LLM's calibration, as well as the challenges they present.
 
 
 
@@ -169,34 +183,22 @@ TruthfulQA \cite{lin2021truthfulqa} is a benchmark to measure whether
 a language model is truthful in generating answers to questions. The benchmark comprises 
 817 questions that span 38 categories, including health, law, finance and politics. 
 Questions are crafted so that some humans would answer falsely due to a false belief or misconception. 
-To perform well, models must avoid generating false answers learned from imitating human texts.  
+To perform well, models must avoid generating false answers learned from imitating human texts. These 
+datasets are especially hard for language models 
+to be accurate can reveal case where accuracy 
+and calibration for a model might deviate. 
 
-\subsubsection{TrivaiQA}
-
-\subsubsection{HumanEval}
-
-\subsubsection{GSM8k}
-
-GSM8K (Grade School Math 8K) is a dataset of 8.5K high quality linguistically diverse 
-grade school math word problems. The dataset was created to support the task of 
-question answering on basic mathematical problems that require multi-step reasoning.
-
-These problems take between 2 and 8 steps to solve. Solutions primarily involve 
-performing a sequence of elementary calculations using basic arithmetic operations  
-to reach the final answer. A bright middle school student should be able 
-to solve every problem: from the paper, "Problems require no concepts beyond the 
-level of early Algebra, and the vast majority of problems can be solved 
-without explicitly defining a variable." Solutions are provided in 
-natural language, as opposed to pure math expressions. 
 
 \subsection{Multiple Choice Query Format}
 
+As language models can be sensitive to prompting formats we breifly describe our question-answering format for multiple choice questions.
+
 MMLU, LogicQA and TruthfulQA datasets provide a set of 
-options for each question in their dataset along with the 
-most appropriate answer. The choices provided are converted 
-are multiple choice question format with lettered set of 
-options next to each possible answer followed by the answer prompt. 
-A sample question prompt might look like: 
+options for each question in their dataset along with 
+the most appropriate answer. The choices provided 
+are converted are multiple choice question format 
+with lettered set of options next to each possible answer followed by the answer prompt. 
+A sample question prompt is shown in Figure \ref{fig:mmlu-sample-question}.
 
 \begin{figure}
 \begin{Verbatim}
@@ -219,15 +221,17 @@ likely belong?
 Answer:
 \end{Verbatim}
 \caption{Sample Question from MMLU Dataset}
+\label{fig:mmlu-sample-question}
 \end{figure}
 
 Constraining the model generation to one of these options 
 allows us to judge the relative probability of each the answer completions by 
 looking at the token completion probability 
 for each of the  formatted options $(A),(B) \dots (D)$ 
-respectively. In a few shot example we include multiple questions 
-with the answer completion filled in after the prompt which allows
-the model to understand the answer format.
+respectively. 
+In a few shot example we include multiple questions 
+with the answer completion filled in after the prompt which allows the model to understand the answer 
+format.
 
 The model is queried in either a \emph{0-shot} or 
 \emph{few-shot} manner. In the few-shot questioning, in 
@@ -236,6 +240,7 @@ with additional questions in the same multiple choice format
 in order to provide the model with enough context 
 to understand the expected format for answering the questions.
 
+\iffalse
 \subsubsection{Completion Questions} %% TODO: Fix
 
 For completion oriented datasets such as HumanEval and GSM8k which 
@@ -250,6 +255,8 @@ with instances where the canonical answer does not match the prompt
 and is therefore incorrect. 
 
 Moreover, we also explore the model's performance with another prompt format (which we only tested on the Humaneval dataset, due to technical limitations). For this part of the experiment, we provide the model with the prompt and lettered options (all extracted from the dataset, one of which is the correct answer and the other ones being retrieved at other indexes), replicating pattern similar to the MMLU dataset. We also run the experiment adding a 'None of the above' option to see if it destabilizes calibration in the same way it does for the MMLU dataset.
+\fi
+
 
 \subsection{Models}
 
@@ -275,8 +282,7 @@ as a helpful conversational agent.
 Most of the experiments in this paper are conducted on the model 
 with $7b$ weights on the \emph{base} and \emph{chat} versions of 
 the model. Additional model weights ($13b$ or $70b$) 
-are used when possible to demonstrate effects of scaling 
-the model.
+are used when possible to demonstrate effects of scaling the model on accuracy and calibration.
 
 \subsubsection{Computing Probability of Completion}
 
@@ -374,10 +380,10 @@ informative as to models' calibration behavior than these summary statistics.
 %% question and the tested hypotheses should be 
 %% included.
 
-\subsection{Introduction}
+%% \subsection{Introduction}
 
 
-\subsection{Model Calibration Results on MMLU (Overall)}
+\subsection{Model Calibration Results on MMLU}
 
 Running the above calibration experiment on the entire 
 MMLU dataset on the models of size $7b$, $13b$, and $70b$ 
@@ -398,7 +404,43 @@ models due to better prompt and contextual understanding.
 In terms of accuracy we find that that, \emph{AUROC} 
 of fine-tuned models is comparable or slightly lower 
 or comparable to the accuracy of base models. See 
-Figure \ref{fig:0-shot-MMLU-ROC}.
+Figure \ref{fig:0-shot-MMLU-roc}.
+
+\begin{figure*}
+     \centering
+     \begin{subfigure}[b]{0.60\textwidth}
+         \centering 
+         \includegraphics[width=1.1\textwidth]{figures/0-shot-MMLU.png}
+         \caption{\textbf{0-shot MMLU} }
+         \label{fig:0-shot-MMLU}
+     \end{subfigure}
+     \hfill
+         \begin{subfigure}[b]{0.38\textwidth}
+         \centering 
+         \includegraphics[width=0.9\textwidth]{figures/0-shot-MMLU-roc.png}
+         \caption{\textbf{0-shot MMLU ROC}}
+         \label{fig:0-shot-MMLU-roc}
+    \end{subfigure}  
+     \hfill
+     \begin{subfigure}[b]{0.60\textwidth}
+         \centering
+         \includegraphics[width=1.1\textwidth]{figures/5-shot-MMLU.png}
+         \caption{\textbf{5-shot-MMLU} }
+         \label{fig:5-shot-MMLU}
+     \end{subfigure}     
+     \begin{subfigure}[b]{0.38\textwidth}
+         \centering 
+         \includegraphics[width=0.9\textwidth]{figures/5-shot-MMLU-roc.png}
+         \caption{\textbf{5-shot MMLU ROC} }
+         \label{fig:5-shot-MMLU-roc}
+    \end{subfigure} 
+    
+        \caption{\textbf{Calibration and Accuracy on MMLU Dataset:}. We note that few-shot prompting leads to greater accuracy and calibration for fine-tuned chat models. Without fine-tuning base models under-predict their selecting the correct answer. The AUROC curves for base models is greater than those for corresponding fine-tuned models under 0-shot prompting. However in few-shot prompting fine-tuned models perform bbetter than base models in both calibration and accuracy. Additionally a sufficiently large chat model for example 70b chat model is able to display good calibration regardless of few-shot prompting.}
+        
+        \label{fig:0-5-shot-MMLU}
+\end{figure*}
+\FloatBarrier
+
 
 \subsection{Few-shot Settings}
 
@@ -408,11 +450,12 @@ model's calibration and accuracy, such that a fine-tuned $7 b$
 model has a lower calibration error than even a $13 b$ base model 
 under  few-shot prompting. See Figure \ref{fig:5-shot-MMLU}.
 
+
 \subsubsection{MMLU Subject-Wise Calibration}
 
 Drilling in further into a subject-wise breakdown of 
 MMLU performance  Figure \ref{fig:MMLU-subjects-7b} and 
-Figure \ref{fig:MMLU-subjects-13b}. We begin by noting that increases 
+Figure \ref{fig:0-5-shot-MMLU-subjects-13b}. We begin by noting that increases 
 in model size do not lead to uniform improvement across specific 
 fields of MMLU. 
 
@@ -484,39 +527,37 @@ only marginally better than their base variants, the fine tuned
 model is much more likely be overconfident on a 
 subset of question than their base variants.  See Figure \ref{fig:5-shot-TruthfulQA}.
 
-\begin{figure*}
-     \centering
-     \begin{subfigure}[b]{0.60\textwidth}
-         \centering 
-         \includegraphics[width=1.1\textwidth]{figures/0-shot-MMLU.png}
-         \caption{\textbf{0-shot MMLU} }
-         \label{fig:0-shot-MMLU}
-     \end{subfigure}
-     \hfill
-         \begin{subfigure}[b]{0.38\textwidth}
-         \centering 
-         \includegraphics[width=0.9\textwidth]{figures/0-shot-MMLU-roc.png}
-         \caption{\textbf{0-shot MMLU ROC}}
-         \label{fig:0-shot-MMLU-roc}
-    \end{subfigure}  
-     \hfill
-     \begin{subfigure}[b]{0.60\textwidth}
-         \centering
-         \includegraphics[width=1.1\textwidth]{figures/5-shot-MMLU.png}
-         \caption{\textbf{5-shot-MMLU} }
-         \label{fig:5-shot-logicqa}
-     \end{subfigure}     
-     \begin{subfigure}[b]{0.38\textwidth}
-         \centering 
-         \includegraphics[width=0.9\textwidth]{figures/5-shot-MMLU-roc.png}
-         \caption{\textbf{5-shot MMLU ROC} }
-         \label{fig:5-shot-MMLU-roc}
-    \end{subfigure} 
-    
-        \caption{\textbf{Calibration and Accuracy on MMLU Dataset:}. We note that few-shot prompting leads to greater accuracy and calibration for fine-tuned chat models. Without fine-tuning base models under-predict their selecting the correct answer. The AUROC curves for base models is greater than those for corresponding fine-tuned models under 0-shot prompting. However in few-shot prompting fine-tuned models perform bbetter than base models in both calibration and accuracy. Additionally a sufficiently large chat model for example 70b chat model is able to display good calibration regardless of few-shot prompting.}
-        
-        \label{fig:0-5-shot-MMLU}
-\end{figure*}
+\section{Discussion}
+%%  Discussion: reflection on the results in light of the 
+%% research question, discussion of limitations of the current 
+%% study and possible future directions for research. 
+%% What worked, what didn’t (why, if you have ideas)? 
+%% This could include ideas that you had during the 
+%% project that you think would be interesting to explore.
+
+
+%% Conclusion (optional, could be combined with the discussion)
+
+In this study we attempted to study language model calibration  under various 
+conditions such as model size, fine tuning and task specialization. We find that 
+we were able to replicate the observed  calibration behavior of closed source models like 
+GPT-3, and  Claude on the open models like Llama base and fine-tuned chat variants. 
+
+On LogicQA, MMLU datasets we find that fine-tuned chat models are better calibrated than their base variants.
+We find that these fine-tuned chat models respond very well to few-shot prompting, with their accuracy and and calibration improving significantly from 0-shot to 5-shot prompting. Additionally simply increasing 
+model size going from 7b to 13b to 70b increases model's accuracy and calibration. Inside of MMLU dataset we find  STEM dataset remains hardest in terms both accuracy and calibration though we do see improvements with larger model sizes.
+
+On difficult datasets such as TruthfulQA, where the 
+model is not able to attain high accuracy, fine-tuning 
+increase model's confidence without the corresponding 
+increase in accuracy. This leads us to believe that 
+calibration is fundamentally limited by model 
+expressiveness for some subset of questions. Here 
+the model cannot, \emph{know that it doesn't know}. Other strategies apart 
+from model conversational fine-tuning are thus required to 
+increase model calibration in these datasets.
+
+
 
 
 \begin{figure*}
@@ -583,7 +624,7 @@ subset of question than their base variants.  See Figure \ref{fig:5-shot-Truthfu
     \end{subfigure} 
     
         \caption{Calibration Performance of Chat and Base models on the MMLU multiple choice question answering dataset.}
-        \label{fig:5-shot-MMLU-subjects-13b}
+        \label{fig:0-5-shot-MMLU-subjects-13b}
 \end{figure*}
 
 
@@ -650,51 +691,9 @@ subset of question than their base variants.  See Figure \ref{fig:5-shot-Truthfu
 \end{figure*}
 
 
-\FloatBarrier
 
 
-\iffalse
-\subsection{HumanEval}
 
-\begin{figure}
-  \includegraphics[width=0.5\textwidth]{figures/0-shot-7b-human-eval.png}
-  \caption{We run a boolean model, to asses ability of model to judge if a proposed solution satisfies a requirement on human eval dataset.}
-  \label{fig:0-shot-7b-human-eval}
-\end{figure}
-
-\subsection{GSM8k}
-
-\subsection{Trivia QA}
-
-\fi
-
-\section{Discussion}
-%%  Discussion: reflection on the results in light of the 
-%% research question, discussion of limitations of the current 
-%% study and possible future directions for research. 
-%% What worked, what didn’t (why, if you have ideas)? 
-%% This could include ideas that you had during the 
-%% project that you think would be interesting to explore.
-
-
-\section{Conclusion}
-%% Conclusion (optional, could be combined with the discussion)
-
-In this study we attempted to study language model calibration  under various conditions such as model size, fine tuning and task specialization. We find that we were able to replicate the observed  calibration behavior of closed source models like 
-GPT-3, and  Claude on the open models like Llama base and fine-tuned chat variants. 
-
-On LogicQA, MMLU datasets we find that fine-tuned chat models are better calibrated than their base variants.
-We find that these fine-tuned chat models respond very well to few-shot prompting, with their accuracy and and calibration improving significantly from 0-shot to 5-shot prompting. Additionally simply increasing 
-model size going from 7b to 13b to 70b increases model's accuracy and calibration. Inside of MMLU dataset we find  STEM dataset remains hardest in terms both accuracy and calibration though we do see improvements with larger model sizes.
-
-On difficult datasets such as TruthfulQA, where the 
-model is not able to attain high accuracy, fine-tuning 
-increase model's confidence without the corresponding 
-increase in accuracy. This leads us to believe that 
-calibration is fundamentally limited by model 
-expressiveness for some subset of questions. Here 
-the model cannot, \emph{know that it doesn't know}. Other strategies apart from model conversational 
-fine-tuning are thus required to increase model calibration in these datasets.
 
 \section{Acknowledgements}
 
@@ -718,8 +717,11 @@ along with the gathered data is publicly available at \cite{Nair_Examining_Calib
 % Entries for the entire Anthology, followed by custom entries
 \bibliography{anthology,custom}
 \bibliographystyle{acl_natbib}
+
 \appendix
 \section{Appendix}
+
+
 
 \subsection{Results}
 
