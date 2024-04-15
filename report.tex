@@ -34,14 +34,19 @@
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{placeins}
+\usepackage{fancyvrb}
+\usepackage{amsmath}
 
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
 % If the title and author information does not fit in the area allocated, uncomment the following
 %
 %\setlength\titlebox{<dim>}
 %
 % and set <dim> to something 5cm or larger.
 
-\title{Examining Large Language Model Calibration for Question Answering}
+\title{Examining Calibration Large Language Model in Question Answering}
 
 % Author information can be set in various styles:
 % For several authors from the same institution:
@@ -71,27 +76,41 @@
 \begin{document}
 \maketitle
 
+%% Abstract: Short summary of the paper (up to 150 words), 
+%% should include the conclusion of your study.
+
 \begin{abstract}
 In this paper, we examine the issue of calibration of large language models. 
-That is the interaction between the \emph{confidence} of a predicted answer 
-on a question-answering task with its \emph{empirical likelihood 
-of being correct}.
+That is the relationship between the \emph{confidence} 
+of a predicted answer on a question-answering task 
+with its \emph{empirical likelihood of being correct}.
 
 We replicate elements of previous calibration study \cite{kadavath2022language} 
 on several multiple-choice  (MMLU, LogicQA, TruthfulQA) and 
 open-ended question answering datasets translated into 
 the multiple choice format (TriviaQA, HumanEval, GSM8k). 
 
-We find that models do scale in their calibration ability by model size. 
-Moreover models fine-tuned for conversation improve in calibration and 
-accuracy under multi-shot prompting. However, we also observe that for tasks beyond 
-models reasoning  capability (complex logical and scientific reasoning) fine-tuning harms models 
-accuracy and leads to overconfidence in model predictions.
+We find that models do scale in their calibration ability by model size. Moreover models fine-tuned as conversation agents do 
+improve in their calibration and accuracy under 
+few-shot prompting. 
+
+However, we also observe that for tasks beyond models 
+reasoning  capability (complex logical and scientific reasoning) 
+fine-tuning harms model's accuracy and leads to 
+overconfidence in model predictions.
 
 \end{abstract}
 
 
 \section{Introduction}
+
+%% Introduction: Introduction, Motivation and explanation of
+%% the research question in the \emph{context of the field}/the 
+%% class, explaining why it is interesting/novel in 
+%% comparison to extant related work. Note that it is NOT 
+%% mandatory to include an exhaustive literature review; 
+%% it is sufficient to mention relevant work from the project 
+%% proposals and the class materials.
 
 Understanding the reliability and correctness of language model (LM) generations is crucial in ensuring their practical utility and trustworthiness. One significant aspect of this inquiry pertains to the calibration of LMs and their ability to accurately indicate uncertainty about their outputs. This issue has gathered considerable attention in recent research, particularly within the context of large-scale language models.
 
@@ -101,84 +120,186 @@ Moreover, an additional challenge in LM-generated content relates to the occurre
 
 
 
+\section{Methods}
 
-
-%% Introduction, Motivation and Explanation of the 
-%% research question in the context 
-%% of the field / the class, explaining why it is 
-%% intersting / novel in comparison 
-%% to extant related work. Note that it is NOT mandatory to include an 
-%% exhaustive literature review; it is sufficient to mention relevant work 
-%% from the project proposals and the class materials
-
-\section{Methodology}
+%% Methods: Detailed description of the study addressing the 
+%% research question (including all details of, e.g., 
+%% the models, datasets, used analyses, etc...). 
+%% It should enable another person reading your paper to *fully*
+%% replicate the study. *No results* or *interpretation* 
+%% should be included yet.
 
 \subsection{Introduction}
-%% Not enough mathematical explanation of what the term mean. 
-%% Not explaining, what log completion probbilty means. 
-%% No explantation of transfoerm completion. 
+%% TODO: Not enough mathematical explanation of what the term mean. 
+%% TODO: Not explaining, what log completion probbilty means. 
+%% TODO: No explantation of transfoerm completion. 
 
-We measure the calibration in keeping with the methodology presented 
-in  \cite{kadavath2022language}. The model is queried in either a
-0-shot or 5-shot manner. The transformer model is given a 
-question prompt  with the each of the multiple choice options.  
+We measure the calibration in keeping with the methodology 
+presented in \cite{kadavath2022language}. 
 
-In the 5-shot methodology, in addition to the question under 
-test we proceed the question with 4 additional questions 
-in the same multiple choice format in order to provide 
-the model with enough context to understand the expected format for answering the questions.
+\subsection{Inference Datasets}
 
-For each prompt completion pair we compute the log probability 
-of  the completion normalized by its completion length. 
-
-The computed probabilities are then grouped in bins in 
-equally weighted bins from  $0$ to $1$ were we compute 
-the average frequency of answering correctly for each bin. 
-
-For ideal calibration, that is when the 
-model completion probability aligns closely with the actual 
-likelihood of answering the question correctly, these 
-two computed probabilities must be equal, thus an 
-ideal calibration would be represented  by a line of 
-slope $1$ in the calibration plot. 
-Negative and positive deviations thus represent a model 
-which is under-confident  or over-confident  in its answers respectively.
-
-We judge the models' accuracy by its ability to assign high-probability to correct answers. The accuracy can be partially summarized using the AUROC metric as well as a 
-receiver operating characteristic curve used where the models
-predicted answer being chosen is considered a true positive classification by the model.
-
-%%% Explain more about AUROC metric.
-
-\subsection{Datasets}
-
-In order to understand the the behavior of 
-base vs chat models (models fine tuned as conversational agents). We test out models of varying sizes (7b, 13b and in some cases 70b parametes) on a variety of question answering datasets. A brief explanation of the datasets used is given here:
+In order to understand the the behavior of base vs fine-tuned chat models (models fine tuned as conversational agents). We test out models of varying sizes (7b, 13b and in some cases 70b parameters) on a variety of question answering datasets. A brief explanation of the datasets used is given here:
 
 \subsubsection{MMLU}
 
 The Measuring Massive Multitask Language Understanding (MMLU) 
-\cite{hendrycks2021measuring} is a massive dataset of multiple choice questions which covers 57 tasks in various subjects including elementary mathematics, US history, computer science, law, and more. For convinience the datasets are grouped into 
-four catagories \emph{STEM},  \emph{Humanities}, \emph{Social Sciences}, and \emph{Other}(global facts, marketing, accounting etc.). Questions test the model for both factual and conceptual understanding of the given topics.
+\cite{hendryckstest2021} \cite{hendrycks2021ethics} is a massive dataset of multiple choice questions which covers 57 tasks in various subjects including elementary mathematics, US history, computer science, law, and more. For convenience the datasets are grouped into 
+four categories \emph{STEM},  \emph{Humanities}, \emph{Social Sciences}, and \emph{Other}(global facts, marketing, accounting etc.). Questions test the model for both factual and conceptual understanding of the given topics.
 
 \subsubsection{LogicQA}
 
-LogicQA comprehensive dataset, named LogiQA, which is sourced from expert-written questions for testing human Logical reasoning. It consists of 8,678 QA instances, covering multiple types of deductive reasoning. Results show that state-of-the-art neural models perform by far worse than human ceiling. Along with TruthfulQA this dataset shows illustrates limitations of calibration when information is less factual in nature.
+LogicQA \cite{liu2020logiqa} is a comprehensive dataset, which is sourced from expert-written questions for testing human logical reasoning. It consists of 8,678 QA instances, covering multiple types of deductive reasoning. Neural modes still lag human performance 
+on these questions.
 
 \subsubsection{TruthfulQA}
 
-TruthfulQA is a benchmark to measure whether a language model is truthful in generating answers to questions. The benchmark comprises 817 questions that span 38 categories, including health, law, finance and politics. Questions are crafted so that some humans would answer falsely due to a false belief or misconception. To perform well, models must avoid generating false answers learned from imitating human texts.  Of the models 
-tested we find this dataset to be the most challenging. 
+TruthfulQA \cite{lin2021truthfulqa} is a benchmark to measure whether 
+a language model is truthful in generating answers to questions. The benchmark comprises 817 questions that span 38 categories, including health, law, finance and politics. Questions are crafted so that some humans would answer falsely due to a false belief or misconception. To perform well, models must avoid generating false answers learned from imitating human texts.  
 
+\subsubsection{TrivaiQA}
 
-\section{Model}
+\subsubsection{HumanEval}
 
-The tests are conducted on the 3 to 4 variants of the 
-LLama Model. For lower memory footprints we use the LLama 7b  model with roughly 7 billion parameters in two variants one base mode which has not been fine tuned using RLHF as a conversational agent as well as Llama 7b chat a model which has been fine tuned for conversation. Additionally 13b and 70b  variants of the two model types are used where feasible. Generally, we find early trends found in 7b models holding for larger parameter variants.
+\subsubsection{GSM8k}
+
+GSM8K (Grade School Math 8K) is a dataset of 8.5K high quality linguistically diverse grade school math word problems. The dataset was created to support the task of question answering on basic mathematical problems that require multi-step reasoning.
+
+These problems take between 2 and 8 steps to solve. Solutions primarily involve performing a sequence of elementary calculations using basic arithmetic operations  to reach the final answer. A bright middle school student should be able to solve every problem: from the paper, "Problems require no concepts beyond the level of early Algebra, and the vast majority of problems can be solved without explicitly defining a variable." Solutions are provided in natural language, as opposed to pure math expressions. 
+
+\subsection{Multiple Choice Query Format}
+
+MMLU, LogicQA and TruthfulQA datasets provide a set of options for each
+question in their dataset along with the most appropriate answer. The choices provided are converted are multiple choice question format with lettered set of options next to each possible answer followed by the answer prompt. A sample question prompt might look like: 
+
+\begin{figure}
+\begin{Verbatim}
+This question refers to the following 
+information.
+
+To him I shall come when I go beyond this 
+life, and to him will come he who has faith 
+and doubts not.
+—The Upanishads, India, c. 1000 BCE
+
+To which religion does the speaker most 
+likely belong?
+
+(A). Hinduism
+(B). Buddhism
+(C). Shintoism
+(D). Zoroastrianism
+
+Answer:
+\end{Verbatim}
+\caption{Sample Question from MMLU Dataset}
+\end{figure}
+
+Constraining the model generation to one of these options 
+allows us to judge the relative probability of each the answer completions by looking at the token completion probability 
+for each of the  formatted options $(A),(B) \dots (D)$ 
+respectively. In a few shot example we include multiple questions 
+with the answer completion filled in after the prompt which allows
+the model to understand the answer format.
+
+The model is queried in either a \emph{0-shot} or 
+\emph{few-shot} manner. In the few-shot questioning, in 
+addition to the question under test we precede the question 
+with additional questions in the same multiple choice format 
+in order to provide the model with enough context 
+to understand the expected format for 
+answering the questions.
+
+\subsubsection{Completion Questions}
+
+For completion oriented datasets such as HumanEval and GSM8k which 
+contain a prompt and a 'canonical answer' for each prompt. In order to 
+translate this into a prompt format based on which we can obtain easily 
+interpretable results, we follow the approach of Kadavath, prompting 
+the model with both the prompt and the canonical answer, asking the 
+model to choose between True and False. However, since this only 
+evaluates whether the model can generate an output based on correct 
+prompts, we also shuffle the dataset in order to also provide the model 
+with instances where the canonical answer does not match the prompt 
+and is therefore incorrect. 
+
+Moreover, we also explore the model's performance with another prompt format (which we only tested on the Humaneval dataset, due to technical limitations). For this part of the experiment, we provide the model with the prompt and lettered options (all extracted from the dataset, one of which is the correct answer and the other ones being retrieved at other indexes), replicating pattern similar to the MMLU dataset. We also run the experiment adding a 'None of the above' option to see if it destabilizes calibration in the same way it does for the MMLU dataset.
+
+\subsection{Models}
+
+The tests are conducted on variants of the  open source LLama Language Models from Meta \cite{touvron2023llama}. The LLama Language model 
+uses a transformer based architecture described in first described in 
+\cite{VaswaniSPUJGKP17} trained on the next-token prediction task on 
+textual datasets. All the model weights as well as the datasets it has 
+been trained on are publicly available. These include large texts from  
+datasets like CommonCrawl, Wikipedia, Github and Gutenberg and other 
+open datasets. 
+
+The model comes in two variants \emph{base} and \emph{chat} of three model sizes $7b$, $13b$ and $70b$ referring to the number of weights/parameters in billions, in each model class. These allow users to trade off model accuracy for inference speed and computational resources required run each of the models. 
+
+The \emph{chat} model is a fine tuned version of the 
+corresponding \emph{base} model. It has been fine tuned using 
+RLHF as described in \cite{ouyang2022training} to act 
+as a helpful conversational agent.
+
+Most of the experiments in this paper are conducted on the model 
+with $7b$ weights on the \emph{base} and \emph{chat} versions of 
+the model. Additional model weights ($13b$ or $70b$) 
+are used when possible to demonstrate effects of scaling 
+the model.
+
+\subsubsection{Computing Probability of Completion}
+
+For each question and a particular possible completion (for example $(A), (B), \dots (D)$)  we tokenize the concatenated prompt completion/answer pair and run inference on the full completion. The model output's logits give us the scores of the each possible token at every position. 
+
+We convert the logits into log-probabilities and extract the probabilities for isolated segment containing just the completion  and compute the mean of this segment to 
+normalize for completions of different length (For most of our multiple choice cases the expected completion is simply the alphanumeric option $(A), (B), \dots $ thus our completions are of the same length).
+
+Having obtained the log-probability for each completions we convert these to a normalized probability by applying a 
+\emph{softmax} over the log-probabilities for 
+each completion. 
+
+The model selected option is considered to be the 
+maximum over these probable answers. 
+
+\begin{equation}
+    o_{selected} = \argmax_{o_i \in l_A, l_B, \dots}  
+    \frac{e^{o_i}}{\sum_{o_j \in l_A, l_B, l_C, \dots} e^{o_j}} 
+\end{equation}
+
+Where $l_A, l_B\dots$ are the corresponding log probabilities of the selected completions/answers.
+
+\subsubsection{Computing Calibration and Accuracy}
+
+Given the selected answer along with the probabilities 
+of the answers which have not been selected we can 
+compute the calibration of the model.  That is the relationship between the \emph{confidence} 
+of a predicted answer on a question-answering task 
+with its \emph{empirical likelihood of being correct},
+using the selected answer and probabilities for all answers which were not-selected. Following the \cite{kadavath2022language},  selected answers and their probabilities are sorted and distributed into bins containing equal number of samples.
+
+Thus we can compute and compare the  empirical estimate of the probability of  the answer in a bin being correct, with the model predicted probability of the answer. For ideal calibration, that is when the model completion 
+probability aligns closely with the empirically estimated probability of answering the question correctly, these  two computed probabilities must be equal. Thus an  ideal calibration would be represented by a line of slope $1$ in 
+on a calibration plot.
+
+We plot these two probabilities we find that for bins 
+where the model \emph{over-confident} its expected 
+probabilities will be larger than the empirical probabilities 
+thus reflected in the ratio lying below the ideal calibration 
+line and when the model is \emph{under-confident} its 
+expected probabilities will be less than its empirical  
+probabilities with the ratio above the 
+ideal calibration line.
+
+We characterize model's ability to discriminate between questions it knows the answer to against ones it doesn't  by using the area under its receiver operating characteristic curve (\emph{AUROC}). A discriminator with \emph{AUROC}  close to 0.5 would  have chance accuracy with 1 being the best. As \emph{AUROC} is indifferent to calibration. We can test the model's accuracy and calibration independently across different datasets of different sizes.
 
 \section{Results}
 
-
+%% Results: results of the study, presented, e.g., 
+%% as a table, figure or described in words, description of 
+%% the results of statistical analyses (if applicable). 
+%% An interpretation with respect to the research 
+%% question and the tested hypotheses should be included.
 
 \begin{figure*}
      \centering
@@ -209,38 +330,38 @@ LLama Model. For lower memory footprints we use the LLama 7b  model with roughly
          \label{fig:0-shot-MMLU}
     \end{subfigure} 
     
-        \caption{Calibration and Accuracy on MMLU Dataset. We note that multi-shot prompting leads 
-        to greater accuracy and calibration for fine-tuned chat models.}
+        \caption{\textbf{Calibration and Accuracy on MMLU Dataset:}. We note that few-shot prompting leads to greater accuracy and calibration for fine-tuned chat models. Without fine-tuning base models under-predict their selecting the correct answer. The AUROC curves for base models is greater than those for corresponding fine-tuned models under 0-shot prompting. However in few-shot prompting fine-tuned models perform bbetter than base models in both calibration and accuracy. Additionally a sufficiently large chat model for example 70b chat model is able to display good calibration regardless of few-shot prompting.}
+        
         \label{fig:three graphs}
 \end{figure*}
 
 \begin{figure*}
      \centering
      \begin{subfigure}[b]{0.60\textwidth}
-         \centering \includegraphics[width=1.1\textwidth]{figures/0-shot-MMLU-subjects.png}
-         \caption{\textbf{0-shot MMLU by Subject(Chat):} }
+         \centering \includegraphics[width=1.1\textwidth]{figures/0-shot-MMLU-subjects-7b.png}
+         \caption{\textbf{0-shot MMLU by Subject(7b):} }
          \label{fig:0-shot-MMLU}
      \end{subfigure}
      \hfill
      \begin{subfigure}[b]{0.38\textwidth}
-         \centering \includegraphics[width=0.9\textwidth]{figures/0-shot-MMLU-subjects-roc.png}
-         \caption{\textbf{0-shot MMLU by Subject ROC (Chat):} Performance on MMLU shows poor classification, however multi-shot prompting enhances classification for subjects the model is predisposed to answer}
+         \centering \includegraphics[width=0.9\textwidth]{figures/0-shot-MMLU-subjects-7b-roc.png}
+         \caption{\textbf{0-shot MMLU by Subject ROC (7b):} Performance on MMLU shows poor classification, however few-shot prompting enhances classification for subjects the model is predisposed to answer}
          \label{fig:0-shot-MMLU-ROC}
     \end{subfigure}
     
      \hfill
      \begin{subfigure}[b]{0.60\textwidth}
          \centering
-         \includegraphics[width=1.1\textwidth]{figures/5-shot-MMLU-subjects.png}
-         \caption{\textbf{5-shot MMLU by Subject(Chat):}  For subjects which the model can correctly 
-         answer multi-shot prompting improves accuracy and calibration}
+         \includegraphics[width=1.1\textwidth]{figures/5-shot-MMLU-subjects-7b.png}
+         \caption{\textbf{5-shot MMLU by Subject(7b):}  For subjects which the model can correctly 
+         answer few-shot prompting improves accuracy and calibration}
          \label{fig:5-shot-logicqa}
      \end{subfigure}     
     \hfill 
      \begin{subfigure}[b]{0.38\textwidth}
-         \centering \includegraphics[width=0.9\textwidth]{figures/5-shot-MMLU-subjects-roc.png}
-         \caption{\textbf{5-shot MMLU by Subject ROC (Chat):} We note large increase in accuracy for 
-         Humanities and Other, category with multi-shot prompting}
+         \centering \includegraphics[width=0.9\textwidth]{figures/5-shot-MMLU-subjects-7b-roc.png}
+         \caption{\textbf{5-shot MMLU by Subject ROC (7b):} We note large increase in accuracy for 
+         Humanities and Other, category with few-shot prompting}
          \label{fig:0-shot-MMLU}
     \end{subfigure} 
     
@@ -248,6 +369,40 @@ LLama Model. For lower memory footprints we use the LLama 7b  model with roughly
         \label{fig:three graphs}
 \end{figure*}
 
+\begin{figure*}
+     \centering
+     \begin{subfigure}[b]{0.60\textwidth}
+         \centering \includegraphics[width=1.1\textwidth]{figures/0-shot-MMLU-subjects-13b.png}
+         \caption{\textbf{0-shot MMLU by Subject(13b):}  Base models out perform fine-tuned models, but they are not calibrated and predict lower probabilities for correct answers}
+         \label{fig:0-shot-MMLU}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.38\textwidth}
+         \centering \includegraphics[width=0.9\textwidth]{figures/0-shot-MMLU-subjects-13b-roc.png}
+         \caption{\textbf{0-shot MMLU by Subject ROC (13b):} Performance on MMLU shows poor classification, however few-shot prompting enhances classification for subjects the model is predisposed to answer}
+         \label{fig:0-shot-MMLU-ROC}
+    \end{subfigure}
+    
+     \hfill
+     \begin{subfigure}[b]{0.60\textwidth}
+         \centering
+         \includegraphics[width=1.1\textwidth]{figures/5-shot-MMLU-subjects-13b.png}
+         \caption{\textbf{5-shot MMLU by Subject(13b):}  For subjects which the model can correctly 
+         answer few-shot prompting improves accuracy and calibration}
+         \label{fig:5-shot-logicqa}
+     \end{subfigure}     
+    \hfill 
+     \begin{subfigure}[b]{0.38\textwidth}
+         \centering \includegraphics[width=0.9\textwidth]{figures/5-shot-MMLU-subjects-13b-roc.png}
+         \caption{\textbf{5-shot MMLU by Subject ROC (13b):} We note large increase in accuracy for 
+         Humanities and Other, category with few-shot prompting}
+         \label{fig:0-shot-MMLU}
+    \end{subfigure} 
+    
+        \caption{Calibration Performance of Chat and Base models on the MMLU multiple choice question answering dataset.}
+        \label{fig:three graphs}
+\end{figure*}
+\
 \subsection{Model Calibration By Number of Parameters}
 
 We compare the calibration of the Llama \cite{touvron2023llama} model 
@@ -326,7 +481,7 @@ We note that that the calibration of the model while not perfect improves with t
 
 We first note that fine tuning improves 0-shot calibration. For both 7b and 13b models as observed in 
 Figure: \ref{fig:chat-vs-hf}. Where we note the chat model is closer to the ideal calibration line. Moreover we observe that 
-multi-shot prompting as substantially improves the calibration of smaller 7-b model bringing it closer to calibration performance 13-b model used without prompting.
+few-shot prompting as substantially improves the calibration of smaller 7-b model bringing it closer to calibration performance 13-b model used without prompting.
 
 
 \subsection{Model Calibration By Subject Specialization}  
@@ -336,6 +491,7 @@ is overconfident and incorrect on scientific questions.
 
 
 
+\FloatBarrier
 
 \subsection{HumanEval}
 
@@ -347,26 +503,26 @@ is overconfident and incorrect on scientific questions.
 
 \subsection{GSM8k}
 
-GSM8K (Grade School Math 8K) is a dataset of 8.5K high quality linguistically diverse grade school math word problems. The dataset was created to support the task of question answering on basic mathematical problems that require multi-step reasoning.
-
-These problems take between 2 and 8 steps to solve. Solutions primarily involve performing a sequence of elementary calculations using basic arithmetic operations  to reach the final answer. A bright middle school student should be able to solve every problem: from the paper, "Problems require no concepts beyond the level of early Algebra, and the vast majority of problems can be solved without explicitly defining a variable." Solutions are provided in natural language, as opposed to pure math expressions. 
-
 \subsection{Trivia QA}
 
 
-
 \section{Discussion}
-
-
+%%  Discussion: reflection on the results in light of the 
+%% research question, discussion of limitations of the current 
+%% study and possible future directions for research. 
+%% What worked, what didn’t (why, if you have ideas)? 
+%% This could include ideas that you had during the 
+%% project that you think would be interesting to explore.
 
 
 \section{Conclusion}
+%% Conclusion (optional, could be combined with the discussion)
 
 In this study we attempted to study language model calibration  under various conditions such as model size, fine tuning and task specialization. We find that we were able to replicate the observed  calibration behavior of closed source models like 
 GPT-3, and  Claude on the open models like Llama base and fine-tuned chat variants. 
 
 On LogicQA, MMLU datasets we find that fine-tuned chat models are better calibrated than their base variants.
-We find that these fine-tuned chat models respond very well to multi-shot prompting, with their accuracy and and calibration improving significantly from 0-shot to 5-shot prompting. Additionally simply increasing 
+We find that these fine-tuned chat models respond very well to few-shot prompting, with their accuracy and and calibration improving significantly from 0-shot to 5-shot prompting. Additionally simply increasing 
 model size going from 7b to 13b to 70b increases model's accuracy and calibration. Inside of MMLU dataset we find  STEM dataset remains hardest in terms both accuracy and calibration though we do see improvements with larger model sizes.
 
 On difficult datasets such as TruthfulQA, where the 
@@ -378,18 +534,33 @@ expressiveness for some subset of questions. Here
 the model cannot, \emph{know that it doesn't know}. Other strategies apart from model conversational 
 fine-tuning are thus required to increase model calibration in these datasets.
 
-
 \section{Acknowledgements}
 
+%% Acknowledgments (optional, should be used to 
+%% acknowledge collaboration with other groups or, e.g., 
+%% usage of coding & writing assistants, other people’s code etc.)
+
 \section{References}
+
+The software to generate and reproduce the study 
+along with the gathered data is publicly available at \cite{Nair_Examining_Calibration_Large}.   
+
+%% logicqa  - liu2020logiqa
+%% thruthfulqa  - lin2021truthfulqa
+%% mmlu - hendryckstest2021 
+%% MMLU  - hendrycks2021ethics
+%% GSM8K - cobbe2021gsm8k
+%% trivia-qa - 2017arXivtriviaqa
+%% humaneval - chen2021evaluating
 
 % Entries for the entire Anthology, followed by custom entries
 \bibliography{anthology,custom}
 \bibliographystyle{acl_natbib}
-
 \appendix
-
 \section{Appendix}
+
+\subsection{Study Materials}
+
 \label{sec:appendix}
 
 \end{document}
