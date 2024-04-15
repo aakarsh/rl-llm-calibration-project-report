@@ -210,7 +210,7 @@ in order to provide the model with enough context
 to understand the expected format for 
 answering the questions.
 
-\subsubsection{Completion Questions}
+\subsubsection{Completion Questions} %% TODO: Fix
 
 For completion oriented datasets such as HumanEval and GSM8k which 
 contain a prompt and a 'canonical answer' for each prompt. In order to 
@@ -269,18 +269,22 @@ maximum over these probable answers.
 
 Where $l_A, l_B\dots$ are the corresponding log probabilities of the selected completions/answers.
 
-\subsubsection{Computing Calibration and Accuracy}
+\subsection{Computing Calibration and Accuracy}
 
 Given the selected answer along with the probabilities 
 of the answers which have not been selected we can 
-compute the calibration of the model.  That is the relationship between the \emph{confidence} 
-of a predicted answer on a question-answering task 
-with its \emph{empirical likelihood of being correct},
-using the selected answer and probabilities for all answers which were not-selected. Following the \cite{kadavath2022language},  selected answers and their probabilities are sorted and distributed into bins containing equal number of samples.
+compute the calibration of the model.  That is the relationship 
+between the \emph{confidence} of a predicted answer on a 
+question-answering task with its \emph{empirical likelihood of being correct}, using the selected answer and probabilities for all answers which were not-selected. Following the \cite{kadavath2022language},  selected answers and their probabilities are sorted and distributed into bins containing equal number of samples.
 
-Thus we can compute and compare the  empirical estimate of the probability of  the answer in a bin being correct, with the model predicted probability of the answer. For ideal calibration, that is when the model completion 
-probability aligns closely with the empirically estimated probability of answering the question correctly, these  two computed probabilities must be equal. Thus an  ideal calibration would be represented by a line of slope $1$ in 
+\subsubsection{Calibration Plots}
+
+We can compute and compare the  empirical estimate of the 
+probability of the answer in a bin being correct, with the model 
+predicted probability of the answer. For ideal calibration, that 
+is when the model completion probability aligns closely with the empirically estimated probability of answering the question correctly, these  two computed probabilities must be equal. Thus an  ideal calibration would be represented by a line of slope $1$ in 
 on a calibration plot.
+
 
 We plot these two probabilities we find that for bins 
 where the model \emph{over-confident} its expected 
@@ -291,15 +295,42 @@ expected probabilities will be less than its empirical
 probabilities with the ratio above the 
 ideal calibration line.
 
-We characterize model's ability to discriminate between questions it knows the answer to against ones it doesn't  by using the area under its receiver operating characteristic curve (\emph{AUROC}). A discriminator with \emph{AUROC}  close to 0.5 would  have chance accuracy with 1 being the best. As \emph{AUROC} is indifferent to calibration. We can test the model's accuracy and calibration independently across different datasets of different sizes.
+\subsubsection{Accuracy Characterization}
+
+We characterize model's ability to discriminate between questions it 
+knows the answer to against ones it doesn't  by using the area under 
+its receiver operating characteristic curve (\textbf{AUROC}). 
+A discriminator with \textbf{AUROC}  close to 0.5 would have 
+chance accuracy with 1 being the best. As \textbf{AUROC} is 
+indifferent to calibration. We can test the model's accuracy 
+and calibration independently across different datasets of 
+different sizes.
+
+\subsubsection{Calibration Error}
+
+Metrics \textbf{Expected calibration error(ECE)} and \textbf{RMS calibration error (RMSE)} are computed as in \cite{kadavath2022language}. 
+
+\begin{equation}
+    E_{ECE} = \frac{1}{N}  \sum_{i}^N | p_{model} - p_{empirical}|
+\end{equation}
+
+\begin{equation}
+    E_{RSME} = \sum_{i}^N \sqrt{\frac{1}{N} (p_{model} - p_{empirical})^2}
+\end{equation}
+
+Where $N$ stands for the number of bins and is set to the standard $10$ bins. We only consider the probability of the model's predicted 
+answer in computing these metrics. Visual calibration plots however 
+are overall found to be more informative as to models' calibration
+behavior than these summary statistics.
 
 \section{Results}
 
-%% Results: results of the study, presented, e.g., 
+%% Results: Results of the study, presented, e.g., 
 %% as a table, figure or described in words, description of 
 %% the results of statistical analyses (if applicable). 
 %% An interpretation with respect to the research 
-%% question and the tested hypotheses should be included.
+%% question and the tested hypotheses should be 
+%% included.
 
 \begin{figure*}
      \centering
@@ -402,7 +433,8 @@ We characterize model's ability to discriminate between questions it knows the a
         \caption{Calibration Performance of Chat and Base models on the MMLU multiple choice question answering dataset.}
         \label{fig:three graphs}
 \end{figure*}
-\
+
+\iffalse
 \subsection{Model Calibration By Number of Parameters}
 
 We compare the calibration of the Llama \cite{touvron2023llama} model 
@@ -410,6 +442,7 @@ We compare the calibration of the Llama \cite{touvron2023llama} model
 figure ... 
 
 We note that that the calibration of the model while not perfect improves with the size of the model with the 13b-chat model being better calibrated and closer to the ideal calibration line than the 7b-chat model. Thus we  note that models sizes improves not only the performance of the model but the calibration of the model as well.
+\fi
 
 \begin{figure*}
      \centering
@@ -475,7 +508,7 @@ We note that that the calibration of the model while not perfect improves with t
         \label{fig:three graphs}
 \end{figure*}
 
-
+\iffalse
 
 \subsection{Model Calibration By Fine Tuning}  
 
@@ -490,6 +523,7 @@ Another interesting phenomenon is seen for subject specialization on the MMLU be
 is overconfident and incorrect on scientific questions.
 
 
+\fi
 
 \FloatBarrier
 
