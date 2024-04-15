@@ -64,19 +64,25 @@
 %         Author 2 \\ Address line \\ ... \\ Address line \And
 %         Author 3 \\ Address line \\ ... \\ Address line}
 
-\author{Aakarsh Nair\\
-  University of Tuebingen / Geschwister-Scholl-Platz, 72074 Tübingen\\
-  \texttt{aakarsh.nair@aakarsh.nair@student.uni-tuebingen.de} 
-  Second Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  \texttt{email@domain} \\}
+%\author{Aakarsh Nair\\
+%  University of Tuebingen / Geschwister-Scholl-Platz, 72074 Tübingen\\
+%  \texttt{aakarsh.nair@student.uni-tuebingen.de} \\
+%  Béla Linus Rösener \\
+%  University of Tuebingen / Geschwister-Scholl-Platz, 72074 Tübingen\\
+%  \texttt{linus.roesener@student.uni-tuebingen.de} \\
+%  Yin-Yin Cheng \\
+%  University of Tuebingen / Geschwister-Scholl-Platz, 72074 Tübingen\\
+%  \texttt{yin-yin.cheng@student.uni-tuebingen.de}
+%  }
 
-%
+\author{Aakarsh Nair \\and Béla Linus Rösener \and Yin-Yin Cheng \\
+         University of Tuebingen / Geschwister-Scholl-Platz, 72074 Tübingen}
 
 \begin{document}
-\maketitle
+{\makeatletter\acl@finalcopytrue
+  \maketitle
+}
+%\maketitle
 
 %% Abstract: Short summary of the paper (up to 150 words), 
 %% should include the conclusion of your study.
@@ -435,7 +441,7 @@ Figure \ref{fig:0-shot-MMLU-roc}.
          \label{fig:5-shot-MMLU-roc}
     \end{subfigure} 
     
-        \caption{\textbf{Calibration and Accuracy on MMLU Dataset:}. We note that few-shot prompting leads to greater accuracy and calibration for fine-tuned chat models. Without fine-tuning base models under-predict their selecting the correct answer. The AUROC curves for base models is greater than those for corresponding fine-tuned models under 0-shot prompting. However in few-shot prompting fine-tuned models perform bbetter than base models in both calibration and accuracy. Additionally a sufficiently large chat model for example 70b chat model is able to display good calibration regardless of few-shot prompting.}
+        \caption{\textbf{Calibration and Accuracy on MMLU Dataset:}. We note that few-shot prompting leads to greater accuracy and calibration for fine-tuned chat models. Without fine-tuning base models under-predict their selecting the correct answer. The AUROC curves for base models is greater than those for corresponding fine-tuned models under 0-shot prompting. However in few-shot prompting fine-tuned models perform better than base models in both calibration and accuracy. Additionally a sufficiently large chat model for example 70b chat model is able to display good calibration regardless of few-shot prompting.}
         
         \label{fig:0-5-shot-MMLU}
 \end{figure*}
@@ -444,10 +450,7 @@ Figure \ref{fig:0-shot-MMLU-roc}.
 
 \subsection{Few-shot Settings}
 
-Our most striking and consistent observation across datasets 
-is that model prompting has a drastic effect on fine-tuned chat 
-model's calibration and accuracy, such that a fine-tuned $7 b$ 
-model has a lower calibration error than even a $13 b$ base model 
+Our most striking and consistent observation across datasets is that model prompting has a drastic effect on fine-tuned chat model's calibration and accuracy, such that a fine-tuned $7 b$ model has a lower calibration error than even a $13 b$ base model 
 under  few-shot prompting. See Figure \ref{fig:5-shot-MMLU}.
 
 
@@ -460,20 +463,17 @@ in model size do not lead to uniform improvement across specific
 fields of MMLU. 
 
 We note that accuracy improvements between $7b$ and 
-$13b$ are roughly monotonic. Such that fields like 
-\emph{Social Studies}, and \emph{Other} where the model shows 
-high accuracy are also the fields which benefit from increased 
-model size.
+$13b$ are roughly monotonic. Fields like 
+\emph{Social Studies}, and \emph{Other} where the 
+model shows high accuracy are also the fields which benefit from increased model size.
 
-Additionally, we note that that these high accuracy fields are 
-also the ones which showed the lowest calibration errors under 
-few-shot testing.
+Additionally, we note that that these high accuracy fields are  also the ones which showed the lowest calibration errors under few-shot testing.
 
 \subsection{Logic QA}
 
 Unlike the MMLU dataset which relies heavily on factual 
-knowledge, LogicQA dataset relies is constructed to rely 
-heavily on requiring the model to perform multiple 
+knowledge, LogicQA dataset is constructed to rely 
+on requiring the model to perform multiple 
 logical reasoning and inference steps. 
 
 Consequently we find that accuracy and 
@@ -485,7 +485,7 @@ See Figure \ref{fig:logic-qa}.
 
 We do still find the major trends observed in 
 MMLU also hold for LogicQA. That is few-shot 
-prompting leads better accuracy and calibration. 
+prompting leads better calibration. 
 
 The gain in accuracy of the $13b$ fine-tuned 
 chat model is minimal going from and AUROC of 
@@ -501,11 +501,7 @@ Furthermore while the accuracy improvements
 between $13b$ (AUROC $.69$) and $7b$(AUROC $.65$) 
 chat models are not significant the $70b$ chat 
 model still able to improve on this accuracy 
-(AUROC of $.78$). 
-
-Making us hypothesize that while scaling is harder on 
-the LogicQA it is still possible givne sufficiently 
-large models.
+(AUROC of $.78$). This makes us  hypothesize that while scaling is harder on the LogicQA sufficiently large models can still learn to perform well on this dataset.
 
 \subsection{Truthful QA}
 
@@ -516,16 +512,16 @@ their ability to avoid reproducing human
 misconceptions and conspiracies. 
 
 Firstly, we note that that the model scaling fails 
-to produce effective improvements in accuracy a $13b$  
+to produce sufficient improvements in accuracy a $13b$  
 fine-tuned chat model has a AUROC of just $0.56$ where 
 $.5$ chance accuracy.  
 
 Moreover while the accuracy of the model under 
 fine-tuning improves only marginally and the overall 
-ECE and  RMSE calibration scores of these fine-tuned models are 
-only marginally better than their base variants, the fine tuned 
-model is much more likely be overconfident on a 
-subset of question than their base variants.  See Figure \ref{fig:5-shot-TruthfulQA}.
+ECE and  RMSE calibration scores of these fine-tuned models are only marginally better than their base variants, the fine tuned model is much 
+more likely be overconfident on a subset of question than their base variants.  See Figure \ref{fig:5-shot-TruthfulQA}. As our benchmark figures for 
+TruthfulQA lower than reported results it remains unclear if model size is a limiting factor on this dataset.
+
 
 \section{Discussion}
 %%  Discussion: reflection on the results in light of the 
@@ -544,7 +540,7 @@ we were able to replicate the observed  calibration behavior of closed source mo
 GPT-3, and  Claude on the open models like Llama base and fine-tuned chat variants. 
 
 On LogicQA, MMLU datasets we find that fine-tuned chat models are better calibrated than their base variants.
-We find that these fine-tuned chat models respond very well to few-shot prompting, with their accuracy and and calibration improving significantly from 0-shot to 5-shot prompting. Additionally simply increasing 
+We find that these fine-tuned chat models respond very well to few-shot prompting, with their accuracy and calibration improving significantly from 0-shot to 5-shot prompting. Additionally simply increasing 
 model size going from 7b to 13b to 70b increases model's accuracy and calibration. Inside of MMLU dataset we find  STEM dataset remains hardest in terms both accuracy and calibration though we do see improvements with larger model sizes.
 
 On difficult datasets such as TruthfulQA, where the 
@@ -553,11 +549,7 @@ increase model's confidence without the corresponding
 increase in accuracy. This leads us to believe that 
 calibration is fundamentally limited by model 
 expressiveness for some subset of questions. Here 
-the model cannot, \emph{know that it doesn't know}. Other strategies apart 
-from model conversational fine-tuning are thus required to 
-increase model calibration in these datasets.
-
-
+the model cannot, \emph{know that it doesn't know}. It remains unclear if this is a limitation of model size or a fundamental limitation of the model itself.  
 
 
 \begin{figure*}
@@ -638,7 +630,7 @@ increase model calibration in these datasets.
      \hfill
      \begin{subfigure}[b]{0.38\textwidth}
          \centering \includegraphics[width=0.9\textwidth]{figures/0-shot-logic-qa-roc.png}
-         \caption{\textbf{0-shot Logic QA ROC:} Bigger fine-tuned modes better accuracy},
+         \caption{\textbf{0-shot Logic QA ROC:} Bigger fine-tuned models show slightly better accuracy}
          \label{fig:0-shot-logic-qa-roc}
     \end{subfigure}  
     
@@ -646,13 +638,13 @@ increase model calibration in these datasets.
      \begin{subfigure}[b]{0.60\textwidth}
          \centering
          \includegraphics[width=1.0\textwidth]{figures/5-shot-logic-qa.png}
-         \caption{\textbf{5-shot Logic QA:} Chat models improve in calibration in 5-shot model, much like MMLU. Base models do not show any such improvement.}
+         \caption{\textbf{5-shot Logic QA:} Chat models improve in calibration in 5-shot questioning, much like MMLU. Base models do not show any such improvement.}
          \label{fig:5-shot-logic-qa}
      \end{subfigure}     
     \hfill 
      \begin{subfigure}[b]{0.38\textwidth}
          \centering \includegraphics[width=0.9\textwidth]{figures/5-shot-logic-qa-roc.png}
-         \caption{\textbf{5-shot Logic QA ROC:}  note that we do not see significant differences in performance before and after prompting. Fine tuning however improves performance and calibration},
+         \caption{\textbf{5-shot Logic QA ROC:}  note that we do not see significant differences in performance before and after prompting. Fine tuning however improves calibration performance},
          \label{fig:5-shot-logic-qa-roc}
     \end{subfigure} 
         \caption{Calibration Performance of Chat and Base models on the LogicQA , logical question answering dataset}
@@ -689,9 +681,6 @@ increase model calibration in these datasets.
         \caption{Calibration Performance of Chat and Base models on the Truthful QA}
         \label{fig:5-shot-TruthfulQA}
 \end{figure*}
-
-
-
 
 
 
